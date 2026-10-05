@@ -1,0 +1,43 @@
+# IDE and editor metadata
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
+
+# Virtual environments and locally installed libraries
+.venv/
+venv/
+env/
+agentvenv/
+lib/
+libs/
+Lib/
+site-packages/
+node_modules/
+
+# Python bytecode, tooling caches, and build output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local configuration and secrets (keep templates trackable)
+.env
+.env.*
+!.env.example
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

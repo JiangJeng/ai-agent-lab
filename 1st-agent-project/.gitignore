@@ -1,0 +1,42 @@
+# Local secrets; keep only the safe example template.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE metadata.
+.idea/
+*.iml
+.vscode/
+
+# Virtual environments and locally installed libraries.
+.venv/
+venv/
+env/
+agentvenv/
+lib/
+lib64/
+libs/
+site-packages/
+
+# Python caches, tests, and packaging output.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Local operating-system and runtime files.
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
