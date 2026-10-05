@@ -8,6 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from google.genai.errors import ClientError, ServerError
 
 from calculator import CALCULATOR_DECLARATION, calculator
 
@@ -38,13 +39,28 @@ def run_agent(prompt: str, client: genai.Client, model: str) -> str:
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
 
-    for _ in range(8):
-        response = client.models.generate_content(
-            model=model, contents=history, config=config
-        )
-        if not response.candidates or response.candidates[0].content is None:
-            raise RuntimeError("Gemini returned no usable content (possibly blocked).")
-
+    for _ in range(5):
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model=model, contents=history, config=config
+                )
+                if not response.candidates or response.candidates[0].content is None:
+                    raise RuntimeError("Gemini returned no usable content (possibly blocked).")
+            except genai.ApiError as exc:   
+                raise RuntimeError(
+                    f"Gemini request failed ({exc.status_code}): {exc.message}"
+                ) from exc
+            except ServerError as exc:
+                # Retry on server errors(5xx), which may be transient. 
+                wait_time = 2 ** attempt # Exponential backoff: 1, 2, 4 seconds
+                print(f"Server error ({exc.status_code}). Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+            except ClientError as exc:
+                # Client errors (4xx) are usually not recoverable, so we raise immediately.
+                print(f"Client error ({exc.status_code}): {exc.message}. Not retrying.")
+                raise exc
+        
         # Preserve the original content, including any thought signatures.
         model_content = response.candidates[0].content
         history.append(model_content)
@@ -106,6 +122,7 @@ def main() -> int:
     except (ValueError, RuntimeError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
+    
     except Exception as exc:
         # Do not print API request details, which could contain credentials.
         print(

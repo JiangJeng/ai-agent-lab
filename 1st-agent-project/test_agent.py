@@ -131,10 +131,10 @@ class AgentTests(unittest.TestCase):
                 self.run_quietly(mock_client(response))
 
     def test_limit(self):
-        client = mock_client(*(tool_response() for _ in range(8)))
+        client = mock_client(*(tool_response() for _ in range(5)))
         with self.assertRaises(RuntimeError):
             self.run_quietly(client)
-        self.assertEqual(client.models.generate_content.call_count, 8)
+        self.assertEqual(client.models.generate_content.call_count, 5)
 
     def test_missing_key(self):
         with (
